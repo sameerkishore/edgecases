@@ -43,7 +43,7 @@ struct SettingsView: View {
 
             VStack(spacing: 10) {
                 SectionTitle("General")
-                SettingRow(icon: "circle.lefthalf.filled", title: "Appearance") {
+                SettingRow(icon: "circle.lefthalf.filled", tint: .secondary, title: "Appearance") {
                     Picker("", selection: $prefs.appearance) {
                         ForEach(Appearance.allCases, id: \.self) { Text($0.title) }
                     }

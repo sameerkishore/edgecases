@@ -36,7 +36,8 @@ struct PanelView: View {
             LevelsCard(levels: edges.levels, swapSides: prefs.swapSides)
 
             VStack(spacing: 10) {
-                SettingRow(icon: "hand.tap.fill", title: "Haptic Feedback", detail: "Ticks as you slide") {
+                SettingRow(icon: "hand.tap.fill", tint: prefs.hapticStrength == .off ? .secondary : .brand,
+                           title: "Haptic Feedback", detail: "Ticks as you slide") {
                     Picker("", selection: $prefs.hapticStrength) {
                         ForEach(HapticStrength.allCases, id: \.self) { Text($0.title) }
                     }
@@ -45,7 +46,7 @@ struct PanelView: View {
                     .controlSize(.small)
                 }
                 SettingRow(icon: "forward.fill", title: "Media Strip", detail: "Slide the bottom edge to skip", isOn: $prefs.mediaStrip)
-                SettingRow(icon: "playpause.fill", tint: .secondary, title: "Tap to Play or Pause", detail: "Tap the bottom edge", isOn: $prefs.tapToPlay)
+                SettingRow(icon: "playpause.fill", title: "Tap to Play or Pause", detail: "Tap the bottom edge", isOn: $prefs.tapToPlay)
             }
 
             Divider()
@@ -73,6 +74,7 @@ struct PanelView: View {
                 Button { NSApp.terminate(nil) } label: {
                     Image(systemName: "power")
                 }
+                .foregroundStyle(.secondary)
                 .help("Quit EdgeCases")
             }
             .buttonStyle(.borderless)

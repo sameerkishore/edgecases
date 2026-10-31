@@ -25,9 +25,9 @@ struct SettingRow<Control: View>: View {
 }
 
 extension SettingRow where Control == AnyView {
-    /// A row with a switch.
-    init(icon: String, tint: Color = .brand, title: String, detail: String? = nil, isOn: Binding<Bool>) {
-        self.init(icon: icon, tint: tint, title: title, detail: detail) {
+    /// A row with a switch. Its icon is coral while the switch is on and grey while it's off.
+    init(icon: String, title: String, detail: String? = nil, isOn: Binding<Bool>) {
+        self.init(icon: icon, tint: isOn.wrappedValue ? .brand : .secondary, title: title, detail: detail) {
             AnyView(Toggle("", isOn: isOn).toggleStyle(.switch).controlSize(.small).labelsHidden())
         }
     }
@@ -43,6 +43,7 @@ struct RowIcon: View {
             .foregroundStyle(.white)
             .frame(width: 26, height: 26)
             .background(Circle().fill(tint.gradient))
+            .animation(.easeOut(duration: 0.15), value: tint)
     }
 }
 

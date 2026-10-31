@@ -52,14 +52,15 @@ func drawIcon(_ c: CGContext, size: CGFloat, palette p: Palette) {
     c.fillEllipse(in: CGRect(x: x - 62, y: 640 - 62, width: 124, height: 124))
 }
 
-/// The same picture as a black template for the menu bar, 20×15 points.
-func drawGlyph(_ c: CGContext, scale: CGFloat) {
+/// The same picture as a black template for the menu bar, 20×15 points. Paused has no finger.
+func drawGlyph(_ c: CGContext, scale: CGFloat, paused: Bool) {
     c.scaleBy(x: scale, y: scale)
     c.setStrokeColor(rgb(0x000000))
     c.setFillColor(rgb(0x000000))
     c.setLineWidth(1.4)
     c.addPath(CGPath(roundedRect: CGRect(x: 1.2, y: 1.2, width: 17.6, height: 12.6), cornerWidth: 2.8, cornerHeight: 2.8, transform: nil))
     c.strokePath()
+    guard !paused else { return }
     c.fillEllipse(in: CGRect(x: 13.2, y: 8.2, width: 3.6, height: 3.6))
     for (y, r) in [(6.0, 0.75), (3.9, 0.6)] as [(CGFloat, CGFloat)] {
         c.fillEllipse(in: CGRect(x: 15 - r, y: y - r, width: r * 2, height: r * 2))
@@ -73,9 +74,8 @@ func write(_ json: String, to url: URL) {
 let fm = FileManager.default
 try? fm.removeItem(at: assets)
 let iconSet = assets.appending(path: "AppIcon.appiconset")
-let glyphSet = assets.appending(path: "MenuBarIcon.imageset")
 let accent = assets.appending(path: "AccentColor.colorset")
-for folder in [iconSet, glyphSet, accent] { try! fm.createDirectory(at: folder, withIntermediateDirectories: true) }
+for folder in [iconSet, accent] { try! fm.createDirectory(at: folder, withIntermediateDirectories: true) }
 write(#"{ "info" : { "author" : "xcode", "version" : 1 } }"#, to: assets.appending(path: "Contents.json"))
 
 var images: [String] = []
@@ -91,14 +91,18 @@ for points in [16, 32, 128, 256, 512] {
 write(#"{ "images" : [ \#(images.joined(separator: ",\n")) ], "info" : { "author" : "xcode", "version" : 1 } }"#,
       to: iconSet.appending(path: "Contents.json"))
 
-var glyphs: [String] = []
-for scale in [1, 2, 3] {
-    let file = "menubar@\(scale)x.png"
-    png(width: 20 * scale, height: 15 * scale, to: glyphSet.appending(path: file)) { drawGlyph($0, scale: CGFloat(scale)) }
-    glyphs.append(#"{ "filename" : "\#(file)", "idiom" : "universal", "scale" : "\#(scale)x" }"#)
+for (name, paused) in [("MenuBarIcon", false), ("MenuBarIconPaused", true)] {
+    let glyphSet = assets.appending(path: "\(name).imageset")
+    try! fm.createDirectory(at: glyphSet, withIntermediateDirectories: true)
+    var glyphs: [String] = []
+    for scale in [1, 2, 3] {
+        let file = "menubar@\(scale)x.png"
+        png(width: 20 * scale, height: 15 * scale, to: glyphSet.appending(path: file)) { drawGlyph($0, scale: CGFloat(scale), paused: paused) }
+        glyphs.append(#"{ "filename" : "\#(file)", "idiom" : "universal", "scale" : "\#(scale)x" }"#)
+    }
+    write(#"{ "images" : [ \#(glyphs.joined(separator: ", ")) ], "info" : { "author" : "xcode", "version" : 1 }, "properties" : { "template-rendering-intent" : "template" } }"#,
+          to: glyphSet.appending(path: "Contents.json"))
 }
-write(#"{ "images" : [ \#(glyphs.joined(separator: ", ")) ], "info" : { "author" : "xcode", "version" : 1 }, "properties" : { "template-rendering-intent" : "template" } }"#,
-      to: glyphSet.appending(path: "Contents.json"))
 
 write(#"""
 { "colors" : [

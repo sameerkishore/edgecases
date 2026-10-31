@@ -59,7 +59,7 @@ private struct GuideStep<Action: View>: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             ZStack {
-                Circle().fill(done ? AnyShapeStyle(.green.gradient) : AnyShapeStyle(.quaternary))
+                Circle().fill(done ? AnyShapeStyle(Color.brand.gradient) : AnyShapeStyle(.quaternary))
                 if done {
                     Image(systemName: "checkmark").font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
                 } else {
@@ -119,13 +119,24 @@ private struct EdgeStrip: View {
                     .fixedSize()
                     .rotationEffect(.degrees(-90))
             }
-            .overlay(alignment: .top) {
-                if active {
-                    Image(systemName: "arrow.up.and.down")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(tint)
-                        .padding(.top, 8)
-                }
+            .overlay {
+                if active { SlidingFinger() }
+            }
+    }
+}
+
+/// A coral fingertip gliding up and down the edge to try, like the app icon's.
+private struct SlidingFinger: View {
+    @State private var up = false
+
+    var body: some View {
+        Circle()
+            .fill(Color.brand)
+            .frame(width: 16, height: 16)
+            .shadow(color: Color.brand.opacity(0.4), radius: 4)
+            .offset(y: up ? -38 : 38)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) { up = true }
             }
     }
 }
