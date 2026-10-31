@@ -87,7 +87,7 @@ own changes and additions go.
 - [x] Sparkle updates from GitHub releases (same setup as Tamil Calendar, its own EdDSA key)
 - [x] DMG packaging (`make_dmg.sh`, `publish_release.sh`)
 - [x] LICENSE (MIT), README with screenshots, contribution notes
-- [ ] Create the GitHub repo, push, and publish 0.1.0
+- [x] Create the GitHub repo, push, and publish 0.1.0
 - [ ] Optional: a Developer ID signature and notarization, so others don't need "Open Anyway"
 
 ## Known risks
