@@ -51,6 +51,7 @@ final class EdgeController {
         case .step(let edge, let count):
             let key = key(for: edge, up: count > 0)
             let modifiers = fineModifiers(for: edge)
+            Log.action.info("Step \(count) on \(String(describing: edge), privacy: .public): \(String(describing: key), privacy: .public), trusted \(Accessibility.isTrusted)")
             for _ in 0..<abs(count) { key.press(modifiers: modifiers) }
             Haptics.tick(preferences.hapticStrength)
         case .ended(let edge):
