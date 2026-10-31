@@ -1,0 +1,43 @@
+name: EdgeCases
+options:
+  bundleIdPrefix: app.edgecases
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+packages:
+  EdgeCore:
+    path: Packages/EdgeCore
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    ARCHS: arm64
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  EdgeCases:
+    type: application
+    platform: macOS
+    sources:
+      - path: EdgeCases
+    dependencies:
+      - package: EdgeCore
+    info:
+      path: EdgeCases/Info.plist
+      properties:
+        CFBundleDisplayName: EdgeCases
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
+        NSPrincipalClass: NSApplication
+        NSHumanReadableCopyright: "© 2026 Sameer Kishore."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.edgecases.EdgeCases
+        PRODUCT_NAME: EdgeCases
+        SWIFT_OBJC_BRIDGING_HEADER: EdgeCases/Touch/EdgeCases-Bridging-Header.h
+        # Self-signed cert in the login Keychain (shared with Tamil Calendar): a stable signature keeps
+        # the Accessibility grant across rebuilds (ad-hoc signatures change every build).
+        CODE_SIGN_IDENTITY: "Tamil Calendar Signing"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: NO
