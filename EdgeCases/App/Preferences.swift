@@ -36,7 +36,8 @@ final class Preferences {
     var requireModifier: Bool { didSet { save(requireModifier, "requireModifier") } }
     var mediaStrip: Bool { didSet { save(mediaStrip, "mediaStrip") } }
     var tapToPlay: Bool { didSet { save(tapToPlay, "tapToPlay") } }
-    var quickMute: Bool { didSet { save(quickMute, "quickMute") } }
+    var topLeftAction: CornerAction { didSet { save(Self.encode(topLeftAction), "topLeftAction") } }
+    var topRightAction: CornerAction { didSet { save(Self.encode(topRightAction), "topRightAction") } }
     var appearance: Appearance { didSet { save(appearance.rawValue, "appearance") } }
     var hasSeenSetupGuide: Bool { didSet { save(hasSeenSetupGuide, "hasSeenSetupGuide") } }
 
@@ -54,7 +55,9 @@ final class Preferences {
         requireModifier = value("requireModifier", false)
         mediaStrip = value("mediaStrip", true)
         tapToPlay = value("tapToPlay", false)
-        quickMute = value("quickMute", true)
+        topLeftAction = Self.decode(defaults.data(forKey: "topLeftAction")) ?? .none
+        // Before corner actions, the top-right corner was a Quick Mute switch.
+        topRightAction = Self.decode(defaults.data(forKey: "topRightAction")) ?? (value("quickMute", true) ? .mute : .none)
         appearance = Appearance(rawValue: value("appearance", "")) ?? .system
         hasSeenSetupGuide = value("hasSeenSetupGuide", false)
     }
@@ -67,8 +70,30 @@ final class Preferences {
         config.requireModifier = requireModifier
         config.mediaStrip = mediaStrip
         config.tapToPlay = tapToPlay
-        config.quickMute = quickMute
+        config.corners = Set(Corner.allCases.filter { action(for: $0) != .none })
         return config
+    }
+
+    func action(for corner: Corner) -> CornerAction {
+        switch corner {
+        case .topLeft: topLeftAction
+        case .topRight: topRightAction
+        }
+    }
+
+    func setAction(_ action: CornerAction, for corner: Corner) {
+        switch corner {
+        case .topLeft: topLeftAction = action
+        case .topRight: topRightAction = action
+        }
+    }
+
+    private static func encode(_ action: CornerAction) -> Data {
+        (try? JSONEncoder().encode(action)) ?? Data()
+    }
+
+    private static func decode(_ data: Data?) -> CornerAction? {
+        data.flatMap { try? JSONDecoder().decode(CornerAction.self, from: $0) }
     }
 
     private func save(_ value: Any, _ key: String) {

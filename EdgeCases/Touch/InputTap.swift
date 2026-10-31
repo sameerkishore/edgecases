@@ -45,6 +45,10 @@ final class InputTap {
     }
 }
 
+/// While set, key presses go here instead of to apps: recording a corner shortcut.
+/// Only touched on the main thread, where the tap runs.
+nonisolated(unsafe) var keyCapture: ((CGEvent) -> Void)?
+
 /// For re-enabling the tap from the callback after the system disables it for being slow.
 nonisolated(unsafe) private var tapPort: CFMachPort?
 
@@ -57,6 +61,10 @@ private func inputTapCallback(
     case .tapDisabledByTimeout, .tapDisabledByUserInput:
         if let tapPort { CGEvent.tapEnable(tap: tapPort, enable: true) }
     case .keyDown:
+        if let capture = keyCapture {
+            capture(event)
+            return nil
+        }
         monitor.keyPressed()
     case .leftMouseDown:
         if !monitor.mouseDown() {

@@ -43,7 +43,6 @@ struct PanelView: View {
                     .fixedSize()
                     .controlSize(.small)
                 }
-                SettingRow(icon: "speaker.slash.fill", title: "Quick Mute", detail: "Double-tap the top-right corner", isOn: $prefs.quickMute)
                 SettingRow(icon: "forward.fill", title: "Media Strip", detail: "Slide the bottom edge to skip", isOn: $prefs.mediaStrip)
                 SettingRow(icon: "playpause.fill", tint: .secondary, title: "Tap to Play or Pause", detail: "Tap the bottom edge", isOn: $prefs.tapToPlay)
             }

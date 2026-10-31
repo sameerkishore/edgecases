@@ -21,8 +21,8 @@ public enum Edge: Sendable, Equatable {
     case left, right, bottom
 }
 
-public enum Corner: Sendable, Equatable {
-    case topRight
+public enum Corner: String, Sendable, Equatable, Hashable, CaseIterable, Codable {
+    case topLeft, topRight
 }
 
 public enum EdgeEvent: Sendable, Equatable {
@@ -55,8 +55,8 @@ public struct EdgeConfig: Sendable, Equatable {
     public var mediaStrip = true
     /// Tap the bottom edge to play or pause.
     public var tapToPlay = false
-    /// Double-tap the top-right corner to mute.
-    public var quickMute = true
+    /// Corners that listen for a double-tap. Each needs an action set in the app.
+    public var corners: Set<Corner> = [.topRight]
 
     // Tuning
     /// Travel before a touch becomes a slide.
@@ -105,7 +105,7 @@ public struct EdgeGestureEngine: Sendable {
     /// Time of the last key press, on the same clock as frames.
     public var lastKeyPress: Double?
     private var phase = Phase.idle
-    private var lastCornerTap: Double?
+    private var lastCornerTap: (corner: Corner, time: Double)?
 
     public init(config: EdgeConfig = EdgeConfig()) {
         self.config = config
@@ -215,8 +215,12 @@ public struct EdgeGestureEngine: Sendable {
             if finger.x >= 1 - config.edgeWidth { side = .right }
         }
         let bottom = (config.mediaStrip || config.tapToPlay) && finger.y <= config.bottomHeight
-        let corner: Corner? = config.quickMute && finger.x >= 1 - config.cornerSize && finger.y >= 1 - config.cornerSize
-            ? .topRight : nil
+        var corner: Corner?
+        if finger.y >= 1 - config.cornerSize {
+            if finger.x <= config.cornerSize { corner = .topLeft }
+            if finger.x >= 1 - config.cornerSize { corner = .topRight }
+        }
+        if let found = corner, !config.corners.contains(found) { corner = nil }
         guard side != nil || bottom || corner != nil else { return nil }
         return Origin(id: finger.id, x: finger.x, y: finger.y, time: time, side: side, bottom: bottom, corner: corner)
     }
@@ -225,11 +229,11 @@ public struct EdgeGestureEngine: Sendable {
     private mutating func tap(_ origin: Origin, at time: Double) -> [EdgeEvent] {
         guard time - origin.time <= config.tapDuration else { return [] }
         if let corner = origin.corner {
-            if let last = lastCornerTap, time - last <= config.doubleTapInterval {
+            if let last = lastCornerTap, last.corner == corner, time - last.time <= config.doubleTapInterval {
                 lastCornerTap = nil
                 return [.doubleTapped(corner)]
             }
-            lastCornerTap = time
+            lastCornerTap = (corner, time)
             return []
         }
         if origin.bottom && config.tapToPlay {

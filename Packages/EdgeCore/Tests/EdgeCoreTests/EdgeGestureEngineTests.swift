@@ -143,3 +143,23 @@ private func config(_ change: (inout EdgeConfig) -> Void) -> EdgeConfig {
     let frames = path(hold) + path([(0.95, 0.95)], start: 0.5)
     #expect(!Trace(frames: frames).replay().contains(.doubleTapped(.topRight)))
 }
+
+@Test func topLeftCornerListensOnlyWhenEnabled() {
+    let frames = path([(0.05, 0.95), (0.05, 0.95)]) + path([(0.05, 0.95), (0.05, 0.95)], start: 0.2)
+    #expect(!Trace(frames: frames).replay().contains(.doubleTapped(.topLeft)))
+    let both = config { $0.corners = [.topLeft, .topRight] }
+    #expect(Trace(frames: frames).replay(config: both).last == .doubleTapped(.topLeft))
+}
+
+@Test func tapsInDifferentCornersDoNotPair() {
+    let both = config { $0.corners = [.topLeft, .topRight] }
+    let frames = path([(0.05, 0.95), (0.05, 0.95)]) + path([(0.95, 0.95), (0.95, 0.95)], start: 0.2)
+    let events = Trace(frames: frames).replay(config: both)
+    #expect(!events.contains(.doubleTapped(.topLeft)) && !events.contains(.doubleTapped(.topRight)))
+}
+
+@Test func slideFromTheTopLeftCornerStillSlides() {
+    let both = config { $0.corners = [.topLeft] }
+    let events = Trace(frames: path([(0.03, 0.95), (0.03, 0.9), (0.03, 0.8)])).replay(config: both)
+    #expect(events.contains(.began(.left)))
+}

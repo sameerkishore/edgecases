@@ -67,10 +67,10 @@ own changes and additions go.
 
 - [ ] Branding: name check, app icon, menu bar icon, accent colour
 - [ ] Design pass on the panel, Settings, and setup guide
-- [ ] Double-tap the top-left corner to run a custom action:
-  - [ ] A keyboard shortcut, recorded in Settings (⌘Space for Raycast, ⌃⌘Q to lock, ⌘F1 to mirror displays)
-  - [ ] Or open an app
-- [ ] Maybe: the same choice for the top-right corner, in place of Quick Mute
+- [x] Double-tap the top-left corner to run a custom action (Settings → Corners):
+  - [x] A keyboard shortcut, recorded in Settings (⌘Space for Raycast, ⌃⌘Q to lock, ⌘F1 to mirror displays)
+  - [x] Or open an app, mute, or play/pause
+- [x] The same choice for the top-right corner, in place of the Quick Mute switch (defaults to Mute)
 
 ### Later ideas
 

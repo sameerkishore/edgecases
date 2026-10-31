@@ -3,7 +3,7 @@ import EdgeCore
 import Observation
 
 /// Turns edge gestures into actions: brightness and volume on the sides, tracks on the bottom,
-/// mute in the top-right corner. Also the state the panel shows.
+/// a chosen action on each corner double-tap. Also the state the panel shows.
 @Observable
 @MainActor
 final class EdgeController {
@@ -14,6 +14,8 @@ final class EdgeController {
     /// Counts slides, so the setup guide can tell when the first one happens.
     private(set) var slidesSeen = 0
     private(set) var isRecording = false
+    /// The corner whose shortcut is being recorded from the next key press.
+    private(set) var recordingCorner: Corner?
 
     @ObservationIgnored private let cursor = CursorLock()
     @ObservationIgnored private var trustTimer: Timer?
@@ -86,6 +88,38 @@ final class EdgeController {
         URL.applicationSupportDirectory.appending(path: "EdgeCases/Traces", directoryHint: .isDirectory)
     }
 
+    // MARK: Corner actions
+
+    /// Captures the next key press as the corner's shortcut. Escape cancels.
+    func recordShortcut(for corner: Corner) {
+        recordingCorner = corner
+        keyCapture = { [weak self] event in
+            MainActor.assumeIsolated {
+                guard let self, let combo = KeyCombo(event: event) else { return }
+                if !combo.isPlainEscape { self.preferences.setAction(.shortcut(combo), for: corner) }
+                self.stopRecordingShortcut()
+            }
+        }
+    }
+
+    func stopRecordingShortcut() {
+        keyCapture = nil
+        recordingCorner = nil
+    }
+
+    func chooseApp(for corner: Corner) {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.application]
+        panel.directoryURL = URL(filePath: "/Applications")
+        panel.prompt = "Choose"
+        panel.message = "Pick an app to open with a \(corner.title.lowercased()) double-tap"
+        NSApp.activate()
+        panel.begin { [weak self] response in
+            guard response == .OK, let url = panel.url else { return }
+            MainActor.assumeIsolated { self?.preferences.setAction(.openApp(path: url.path), for: corner) }
+        }
+    }
+
     // MARK: Gestures
 
     private func handle(_ event: EdgeEvent) {
@@ -112,9 +146,10 @@ final class EdgeController {
             Log.action.info("Bottom edge tapped: play/pause")
             MediaKey.play.press()
             Haptics.tick(preferences.hapticStrength)
-        case .doubleTapped:
-            Log.action.info("Corner double-tapped: mute")
-            MediaKey.mute.press()
+        case .doubleTapped(let corner):
+            let action = preferences.action(for: corner)
+            Log.action.info("\(corner.title, privacy: .public) double-tapped: \(action.summary, privacy: .public)")
+            action.perform()
             Haptics.tick(preferences.hapticStrength)
             levels.refreshSoon()
         }
