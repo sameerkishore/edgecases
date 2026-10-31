@@ -3,7 +3,7 @@ import SwiftUI
 /// A settings row: round icon, title and detail, and a control on the right.
 struct SettingRow<Control: View>: View {
     let icon: String
-    var tint: Color = .accentColor
+    var tint: Color = .brand
     let title: String
     var detail: String?
     @ViewBuilder var control: Control
@@ -26,7 +26,7 @@ struct SettingRow<Control: View>: View {
 
 extension SettingRow where Control == AnyView {
     /// A row with a switch.
-    init(icon: String, tint: Color = .accentColor, title: String, detail: String? = nil, isOn: Binding<Bool>) {
+    init(icon: String, tint: Color = .brand, title: String, detail: String? = nil, isOn: Binding<Bool>) {
         self.init(icon: icon, tint: tint, title: title, detail: detail) {
             AnyView(Toggle("", isOn: isOn).toggleStyle(.switch).controlSize(.small).labelsHidden())
         }
@@ -35,7 +35,7 @@ extension SettingRow where Control == AnyView {
 
 struct RowIcon: View {
     let symbol: String
-    var tint: Color = .accentColor
+    var tint: Color = .brand
 
     var body: some View {
         Image(systemName: symbol)
@@ -89,8 +89,9 @@ struct PanelHeader: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: "rectangle.and.hand.point.up.left.fill")
-                .foregroundStyle(.tint)
+            Image("MenuBarIcon")
+                .renderingMode(.template)
+                .foregroundStyle(Color.brand)
             Text(title).font(.headline)
             Spacer()
             StatusBadge(edges: edges)
@@ -112,6 +113,11 @@ struct StatusBadge: View {
             Text(label).font(.caption).foregroundStyle(.secondary)
         }
     }
+}
+
+extension Color {
+    /// EdgeCases coral. Unlike `.accentColor`, it stays coral when a system accent colour is set.
+    static let brand = Color("AccentColor")
 }
 
 extension Double {

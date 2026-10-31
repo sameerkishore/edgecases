@@ -11,6 +11,9 @@ struct SetupGuideView: View {
         let slid = slidesAtStart.map { edges.slidesSeen > $0 } ?? false
         VStack(spacing: 20) {
             VStack(spacing: 6) {
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .frame(width: 72, height: 72)
                 Text("Welcome to EdgeCases").font(.title2.weight(.semibold))
                 Text("Slide along the edges of your trackpad to change brightness and volume.")
                     .foregroundStyle(.secondary)
@@ -41,6 +44,7 @@ struct SetupGuideView: View {
         }
         .padding(24)
         .frame(width: 420)
+        .tint(.brand)
         .onAppear { slidesAtStart = edges.slidesSeen }
     }
 }

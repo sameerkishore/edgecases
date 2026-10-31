@@ -99,7 +99,7 @@ private struct CornerRow: View {
         let prefs = edges.preferences
         let action = prefs.action(for: corner)
         let recording = edges.recordingCorner == corner
-        SettingRow(icon: corner.symbol, tint: action == .none ? .secondary : .accentColor, title: corner.title,
+        SettingRow(icon: corner.symbol, tint: action == .none ? .secondary : .brand, title: corner.title,
                    detail: recording ? "Press a shortcut, or Esc to cancel" : action.detail) {
             if recording {
                 Button("Cancel") { edges.stopRecordingShortcut() }.controlSize(.small)

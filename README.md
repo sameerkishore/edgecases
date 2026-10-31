@@ -35,6 +35,9 @@ entry with − and add it again: macOS ties the grant to the app's signature.
 Settings → Record Touches saves real trackpad traces (with key presses and clicks) as JSON, for
 turning tricky cases into `Trace.replay` tests.
 
+The app icon, menu bar glyph, and coral accent are drawn by `swift scripts/make-icons.swift`, which
+rewrites `EdgeCases/Assets.xcassets`.
+
 Debug and release builds accept `-snapshot <folder>`, which renders the panel, Settings, and setup
 guide in light and dark to PNGs and quits:
 `build/Build/Products/Debug/EdgeCases.app/Contents/MacOS/EdgeCases -snapshot /tmp/snaps`

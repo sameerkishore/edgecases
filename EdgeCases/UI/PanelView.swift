@@ -16,6 +16,7 @@ struct PanelRoot: View {
             }
         }
         .frame(width: 300)
+        .tint(.brand)
     }
 }
 

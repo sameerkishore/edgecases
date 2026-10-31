@@ -65,7 +65,7 @@ own changes and additions go.
 
 ## Phase 4 — Branding, design, and custom corner actions
 
-- [ ] Branding: name check, app icon, menu bar icon, accent colour
+- [x] Branding: app icon, menu bar icon, coral accent (drawn by `scripts/make-icons.swift`); keeping the name
 - [ ] Design pass on the panel, Settings, and setup guide
 - [x] Double-tap the top-left corner to run a custom action (Settings → Corners):
   - [x] A keyboard shortcut, recorded in Settings (⌘Space for Raycast, ⌃⌘Q to lock, ⌘F1 to mirror displays)

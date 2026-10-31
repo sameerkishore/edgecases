@@ -8,7 +8,7 @@ struct EdgeCasesApp: App {
         MenuBarExtra {
             PanelRoot(edges: delegate.edges, onShowGuide: delegate.showSetupGuide)
         } label: {
-            Image(systemName: "rectangle.and.hand.point.up.left")
+            Image("MenuBarIcon")
         }
         .menuBarExtraStyle(.window)
     }
