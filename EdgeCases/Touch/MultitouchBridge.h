@@ -48,3 +48,7 @@ int ECMultitouchStart(MTFrameCallback callback);
 
 /// Stops every device started by ECMultitouchStart.
 void ECMultitouchStop(void);
+
+/// Plays one of the built-in trackpad's haptic waveforms. Opens the actuator on first use.
+/// Returns false if there's no actuator to play it on.
+bool ECHapticActuate(int32_t actuationID);

@@ -35,9 +35,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.edgecases.EdgeCases
         PRODUCT_NAME: EdgeCases
         SWIFT_OBJC_BRIDGING_HEADER: EdgeCases/Touch/EdgeCases-Bridging-Header.h
-        # Self-signed cert in the login Keychain (shared with Tamil Calendar): a stable signature keeps
-        # the Accessibility grant across rebuilds (ad-hoc signatures change every build).
-        CODE_SIGN_IDENTITY: "Tamil Calendar Signing"
+        # Self-signed cert in the login Keychain: a stable signature keeps the Accessibility grant
+        # across rebuilds (ad-hoc signatures change every build).
+        CODE_SIGN_IDENTITY: "EdgeCases Signing"
         CODE_SIGN_STYLE: Manual
         DEVELOPMENT_TEAM: ""
         ENABLE_HARDENED_RUNTIME: NO

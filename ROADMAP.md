@@ -10,14 +10,14 @@ own changes and additions go.
 ## Phase 0 — Foundations ✅
 
 - [x] Git repo, XcodeGen `project.yml`, `scripts/build.sh` and `scripts/run.sh`
-- [x] Stable self-signed code signature, so the Accessibility grant survives rebuilds
+- [x] Stable self-signed code signature ("EdgeCases Signing"), so the Accessibility grant survives rebuilds
 - [x] Menu bar shell: no Dock icon, status menu with Enabled and Quit
 - [x] Accessibility check and prompt
 - [x] Read raw trackpad touches through MultitouchSupport (private framework, loaded with `dlopen`)
 - [x] Restart the touch stream after the Mac wakes from sleep
 - [x] `EdgeCore` package: the edge gesture engine as pure Swift, with tests
 
-## Phase 1 — Core slide (prototype) 🧪 built, in hands-on testing
+## Phase 1 — Core slide (prototype) ✅
 
 - [x] Slide on the left edge for brightness, the right edge for volume
 - [x] Use synthetic media keys, so we get the system's own on-screen display and step sizes
@@ -27,18 +27,29 @@ own changes and additions go.
 
 **Done when:** sliding feels reliable in daily use and never interferes with normal pointing.
 
-## Phase 2 — More gestures and tuning
+## Phase 2 — More gestures and tuning 🧪 built, in hands-on testing
 
-- [ ] Fine control: Shift-Option for quarter steps (the modifier also works on the real keys)
-- [ ] Quick Mute: double-tap the top-right corner
-- [ ] Media Strip: swipe along the bottom edge for the next or previous track
-- [ ] Tap the bottom edge to play or pause (optional, off by default)
-- [ ] Swap sides (brightness on the right)
-- [ ] Bottom part of the trackpad only: ignore touches above a set height
-- [ ] Require a modifier (Fn or ⌥) to slide
-- [ ] Sensitivity and edge width settings
-- [ ] Settings saved in `UserDefaults`
-- [ ] Tests that replay recorded touch traces through the engine
+- [x] Separate "EdgeCases Signing" certificate
+- [x] Haptic strength: Off, Light, Medium, Strong, played on the trackpad's actuator (private API) instead of
+      the faint public haptics. Debug → Play Haptic Waveform tries the other waveforms.
+- [x] Fine control: Shift-Option for quarter steps (the modifier also works on the real keys)
+- [x] Quick Mute: double-tap the top-right corner
+- [x] Media Strip: slide along the bottom edge for the next or previous track (one skip per slide)
+- [x] Tap the bottom edge to play or pause (optional, off by default); a physical click there is not a tap
+- [x] Swap sides (brightness on the right)
+- [x] Bottom Quarter Only: side slides only start in the lowest 25%
+- [x] Require a modifier (Fn or ⌥) to slide
+- [x] Freeze Cursor can be turned off
+- [x] Sensitivity and edge width settings
+- [x] Settings saved in `UserDefaults`, set from the menu for now
+- [x] Accidental touches:
+  - [x] Ignore touches that start within 0.5 s of a key press (hands on the keyboard)
+  - [x] A key press during a touch cancels it
+  - [x] A touch that rests 0.6 s without sliding is a resting finger or palm, not a slide
+  - [x] A physical click during a touch cancels it
+- [x] Engine tests replay traces; Debug → Record Touches saves real ones to `~/Library/Application Support/EdgeCases/Traces`
+- [ ] Record a trace of typing with accidental triggers, turn it into a test, and tune (contact size may tell palms apart)
+- [ ] Check the swallowing of tap-to-click's click after an edge tap (only matters with Tap to Click on; untested)
 
 ## Phase 3 — Menu bar panel and Settings
 
@@ -48,7 +59,6 @@ own changes and additions go.
 - [ ] A separate Settings page for set-once options
 - [ ] Light and Dark appearance
 - [ ] Open at Login (`SMAppService`)
-- [ ] Haptic strength (Off, Light, Strong) using the private actuator API
 - [ ] First-run guide: grant Accessibility, try your first slide
 - [ ] App icon
 
