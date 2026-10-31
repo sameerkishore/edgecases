@@ -27,7 +27,7 @@ own changes and additions go.
 
 **Done when:** sliding feels reliable in daily use and never interferes with normal pointing.
 
-## Phase 2 — More gestures and tuning 🧪 built, in hands-on testing
+## Phase 2 — More gestures and tuning ✅
 
 - [x] Separate "EdgeCases Signing" certificate
 - [x] Haptic strength: Off, Light, Medium, Strong, played on the trackpad's actuator (private API) instead of
@@ -48,27 +48,35 @@ own changes and additions go.
   - [x] A touch that rests 0.6 s without sliding is a resting finger or palm, not a slide
   - [x] A physical click during a touch cancels it
 - [x] Engine tests replay traces; Debug → Record Touches saves real ones to `~/Library/Application Support/EdgeCases/Traces`
-- [ ] Record a trace of typing with accidental triggers, turn it into a test, and tune (contact size may tell palms apart)
+- [x] Typing no longer triggers slides in daily use (record a trace if it comes back)
 - [ ] Check the swallowing of tap-to-click's click after an edge tap (only matters with Tap to Click on; untested)
 
-## Phase 3 — Menu bar panel and Settings
+## Phase 3 — Menu bar panel and Settings 🧪 built, in hands-on testing
 
-- [ ] SwiftUI panel: live brightness and volume levels drawn on the edges that control them
-- [ ] Everyday toggles up front: haptics, Quick Mute, Media Strip, Tap to Play
-- [ ] Sensitivity and edge width sliders
-- [ ] A separate Settings page for set-once options
-- [ ] Light and Dark appearance
-- [ ] Open at Login (`SMAppService`)
-- [ ] First-run guide: grant Accessibility, try your first slide
-- [ ] App icon
+- [x] SwiftUI panel: live brightness and volume levels drawn on the edges that control them
+- [x] Everyday toggles up front: haptic strength, Quick Mute, Media Strip, Tap to Play
+- [x] Sensitivity and edge width sliders, and an on/off switch
+- [x] A separate Settings page for set-once options
+- [x] Appearance: System, Light, or Dark
+- [x] Open at Login (`SMAppService`); `scripts/install.sh` puts the app in /Applications first
+- [x] First-run guide: grant Accessibility, try your first slide (it ticks off as you go)
+- [x] Picks up the Accessibility grant, or its removal, without a relaunch
+- [x] `-snapshot <folder>` renders the panel, Settings, and guide in light and dark, for design checks
 
-## Phase 4 — Our own changes and additions (to decide)
+## Phase 4 — Branding, design, and custom corner actions
 
-Ideas so far; we pick from these and add our own:
+- [ ] Branding: name check, app icon, menu bar icon, accent colour
+- [ ] Design pass on the panel, Settings, and setup guide
+- [ ] Double-tap the top-left corner to run a custom action:
+  - [ ] A keyboard shortcut, recorded in Settings (⌘Space for Raycast, ⌃⌘Q to lock, ⌘F1 to mirror displays)
+  - [ ] Or open an app
+- [ ] Maybe: the same choice for the top-right corner, in place of Quick Mute
+
+### Later ideas
 
 - [ ] Brightness for external monitors (DDC, as MonitorControl does)
 - [ ] Magic Trackpad support, including plugging it in and out
-- [ ] Choose any action per edge or corner (keyboard backlight, app switching, scrolling, Mission Control, shortcuts)
+- [ ] Any action per edge (keyboard backlight, app switching, scrolling, Mission Control)
 - [ ] Profiles per app or display setup
 - [ ] Our own on-screen display as an alternative to the system one
 

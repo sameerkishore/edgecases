@@ -9,6 +9,7 @@ See [ROADMAP.md](ROADMAP.md) for what's built and what's next.
 
 ```bash
 ./scripts/run.sh        # debug build, launches from build/
+./scripts/install.sh    # release build into /Applications (use this for Open at Login)
 ```
 
 Requires Xcode, XcodeGen (`brew install xcodegen`), and a code signing identity named
@@ -27,11 +28,16 @@ entry with − and add it again: macOS ties the grant to the app's signature.
 |---|---|
 | `Packages/EdgeCore` | The edge gesture engine: trackpad frames in, slides and steps out (`swift test`) |
 | `EdgeCases/Touch` | Bridge to the private MultitouchSupport framework (touches, haptics), the monitor that feeds the engine, and the key/click tap |
-| `EdgeCases/System` | Media keys, haptics, cursor lock, Accessibility |
-| `EdgeCases/App` | App delegate, menu bar, preferences, and the controller that maps gestures to actions |
+| `EdgeCases/System` | Media keys, haptics, live levels, cursor lock, login item, Accessibility |
+| `EdgeCases/App` | App entry, preferences, and the controller that maps gestures to actions |
+| `EdgeCases/UI` | SwiftUI menu bar panel, Settings page, and setup guide |
 
-Debug → Record Touches saves real trackpad traces (with key presses and clicks) as JSON, for
+Settings → Record Touches saves real trackpad traces (with key presses and clicks) as JSON, for
 turning tricky cases into `Trace.replay` tests.
+
+Debug and release builds accept `-snapshot <folder>`, which renders the panel, Settings, and setup
+guide in light and dark to PNGs and quits:
+`build/Build/Products/Debug/EdgeCases.app/Contents/MacOS/EdgeCases -snapshot /tmp/snaps`
 
 Logs: `/usr/bin/log stream --level info --predicate 'subsystem == "app.edgecases.EdgeCases"'`
 

@@ -1,16 +1,19 @@
 import AppKit
+import SwiftUI
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let edges = EdgeController()
-    private var menuBar: MenuBarController?
-    private var trustTimer: Timer?
+    let edges = EdgeController()
+    private var guideWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let trackpadFound = edges.start()
-        menuBar = MenuBarController(edges: edges, trackpadFound: trackpadFound)
-        if !Accessibility.requestIfNeeded() {
-            waitForAccessibility()
+        edges.start()
+        if let index = CommandLine.arguments.firstIndex(of: "-snapshot"), index + 1 < CommandLine.arguments.count {
+            Snapshot.render(edges: edges, to: URL(filePath: CommandLine.arguments[index + 1]))
+            exit(0)
+        }
+        if !edges.preferences.hasSeenSetupGuide || !edges.isTrusted {
+            showSetupGuide()
         }
     }
 
@@ -19,17 +22,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         edges.stop()
     }
 
-    /// Picks up the grant as soon as it's given in System Settings, without a relaunch.
-    private func waitForAccessibility() {
-        Log.action.notice("Waiting for Accessibility access")
-        trustTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated {
-                guard let self, Accessibility.isTrusted else { return }
-                Log.action.notice("Accessibility access granted")
-                self.trustTimer?.invalidate()
-                self.trustTimer = nil
-                self.edges.installInputTap()
-            }
+    func showSetupGuide() {
+        if guideWindow == nil {
+            let window = NSWindow(
+                contentRect: .zero, styleMask: [.titled, .closable, .fullSizeContentView],
+                backing: .buffered, defer: false
+            )
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.isReleasedWhenClosed = false
+            window.contentViewController = NSHostingController(rootView: SetupGuideView(edges: edges) { [weak self] in
+                self?.edges.preferences.hasSeenSetupGuide = true
+                self?.guideWindow?.close()
+            })
+            window.center()
+            guideWindow = window
         }
+        NSApp.activate()
+        guideWindow?.makeKeyAndOrderFront(nil)
     }
 }
