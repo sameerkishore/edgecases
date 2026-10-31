@@ -2,7 +2,8 @@ import CoreGraphics
 import os
 
 /// Watches key presses and clicks system-wide, so the engine can tell typing palms and physical
-/// clicks from edge gestures, and swallow tap-to-click's click after an edge tap.
+/// clicks from edge gestures, swallow tap-to-click's click after an edge tap, and hold the
+/// pointer still during a slide when Freeze Cursor is on.
 /// Needs Accessibility access; `install()` fails until it's granted.
 @MainActor
 final class InputTap {
@@ -21,6 +22,8 @@ final class InputTap {
         let mask: CGEventMask = (1 << CGEventType.keyDown.rawValue)
             | (1 << CGEventType.leftMouseDown.rawValue)
             | (1 << CGEventType.leftMouseUp.rawValue)
+            | (1 << CGEventType.mouseMoved.rawValue)
+            | (1 << CGEventType.leftMouseDragged.rawValue)
         guard let port = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
@@ -62,6 +65,11 @@ private func inputTapCallback(
         }
     case .leftMouseUp:
         if !monitor.mouseUp() { return nil }
+    case .mouseMoved, .leftMouseDragged:
+        if let point = CursorLock.frozenAt.withLock({ $0 }) {
+            CGWarpMouseCursorPosition(point)
+            return nil
+        }
     default:
         break
     }
