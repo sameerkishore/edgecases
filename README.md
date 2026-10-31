@@ -74,6 +74,19 @@ Accessibility state:
 
 Logs: `/usr/bin/log stream --level info --predicate 'subsystem == "app.edgecases.EdgeCases"'`
 
+## Workflow
+
+Each feature or fix gets its own branch off `main` (short kebab-case name, like `corner-actions`)
+and a pull request titled with what changes for the user ("Corners can open any app"). PRs are
+squash-merged, so `main` reads as one commit per feature.
+
+Releases bundle 3–5 merged features:
+
+1. Branch `release-0.2.0`, run `./scripts/bump_version.sh 0.2.0`, and open a "Version 0.2.0" PR.
+2. Squash-merge it, then on the updated `main`: `git tag 0.2.0 && git push origin 0.2.0`.
+3. `./scripts/publish_release.sh 0.2.0 "notes"` builds, signs, and publishes the DMG and appcast.
+4. Delete the release's feature branches, locally and on GitHub.
+
 ## Contributing
 
 Issues and pull requests are welcome. For gesture changes, a recorded trace that shows the problem
