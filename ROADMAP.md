@@ -83,10 +83,11 @@ own changes and additions go.
 
 ## Phase 5 — Release and open source
 
-- [ ] Install script for `/Applications` (needed for Open at Login)
-- [ ] Sparkle updates from GitHub releases (same setup as Tamil Calendar)
-- [ ] DMG packaging
-- [ ] LICENSE, README with screenshots, contribution notes
+- [x] Install script for `/Applications` (needed for Open at Login)
+- [x] Sparkle updates from GitHub releases (same setup as Tamil Calendar, its own EdDSA key)
+- [x] DMG packaging (`make_dmg.sh`, `publish_release.sh`)
+- [x] LICENSE (MIT), README with screenshots, contribution notes
+- [ ] Create the GitHub repo, push, and publish 0.1.0
 - [ ] Optional: a Developer ID signature and notarization, so others don't need "Open Anyway"
 
 ## Known risks

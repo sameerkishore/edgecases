@@ -5,6 +5,7 @@ import SwiftUI
 struct SettingsView: View {
     let edges: EdgeController
     var onShowGuide: () -> Void = {}
+    var onCheckForUpdates: () -> Void = {}
     let onBack: () -> Void
     @State private var openAtLogin = LoginItem.isEnabled
 
@@ -63,6 +64,9 @@ struct SettingsView: View {
                 SectionTitle("Help")
                 SettingRow(icon: "sparkles", tint: .secondary, title: "Setup Guide") {
                     Button("Show", action: onShowGuide).controlSize(.small)
+                }
+                SettingRow(icon: "arrow.down.circle", tint: .secondary, title: "Updates", detail: "Checked daily") {
+                    Button("Check Now", action: onCheckForUpdates).controlSize(.small)
                 }
                 SettingRow(icon: "record.circle", tint: edges.isRecording ? .red : .secondary, title: "Record Touches",
                            detail: "Save a trace for tuning gestures") {

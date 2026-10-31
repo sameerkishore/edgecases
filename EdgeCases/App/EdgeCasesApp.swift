@@ -6,7 +6,7 @@ struct EdgeCasesApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            PanelRoot(edges: delegate.edges, onShowGuide: delegate.showSetupGuide)
+            PanelRoot(edges: delegate.edges, onShowGuide: delegate.showSetupGuide, onCheckForUpdates: delegate.checkForUpdates)
         } label: {
             // An empty trackpad while paused.
             Image(delegate.edges.preferences.enabled ? "MenuBarIcon" : "MenuBarIconPaused")

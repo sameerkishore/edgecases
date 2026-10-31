@@ -1,9 +1,12 @@
 import AppKit
+import Sparkle
 import SwiftUI
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let edges = EdgeController()
+    /// Checks the GitHub releases appcast daily, and on demand from Settings.
+    private let updater = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     private var guideWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -20,6 +23,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         // Never leave the pointer detached from the trackpad.
         edges.stop()
+    }
+
+    func checkForUpdates() {
+        NSApp.activate()
+        updater.checkForUpdates(nil)
     }
 
     func showSetupGuide() {

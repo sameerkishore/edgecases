@@ -7,6 +7,9 @@ options:
 packages:
   EdgeCore:
     path: Packages/EdgeCore
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.6.0"
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -20,6 +23,7 @@ targets:
       - path: EdgeCases
     dependencies:
       - package: EdgeCore
+      - package: Sparkle
     info:
       path: EdgeCases/Info.plist
       properties:
@@ -30,6 +34,10 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         NSPrincipalClass: NSApplication
         NSHumanReadableCopyright: "© 2026 Sameer Kishore."
+        # Updates come from the latest GitHub release; scripts/publish_release.sh uploads the appcast.
+        SUFeedURL: https://github.com/sameerkishore/edgecases/releases/latest/download/appcast.xml
+        SUPublicEDKey: uRqL/pC3TLBg/Xaykwtrn/Rd9eN35rCWGBQZUGRaSos=
+        SUEnableAutomaticChecks: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.edgecases.EdgeCases

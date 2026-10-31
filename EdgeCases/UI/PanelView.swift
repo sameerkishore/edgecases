@@ -4,6 +4,7 @@ import SwiftUI
 struct PanelRoot: View {
     let edges: EdgeController
     var onShowGuide: () -> Void = {}
+    var onCheckForUpdates: () -> Void = {}
     @State var page = Page.main
 
     enum Page { case main, settings }
@@ -12,7 +13,7 @@ struct PanelRoot: View {
         Group {
             switch page {
             case .main: PanelView(edges: edges) { page = .settings }
-            case .settings: SettingsView(edges: edges, onShowGuide: onShowGuide) { page = .main }
+            case .settings: SettingsView(edges: edges, onShowGuide: onShowGuide, onCheckForUpdates: onCheckForUpdates) { page = .main }
             }
         }
         .frame(width: 300)
