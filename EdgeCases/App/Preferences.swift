@@ -16,6 +16,22 @@ enum Appearance: String, CaseIterable {
     }
 }
 
+/// Which side edges need a quick tap before a slide counts.
+enum TapToSlide: String, CaseIterable {
+    case both, left, right, off
+
+    var title: String { rawValue.capitalized }
+
+    var edges: Set<Edge> {
+        switch self {
+        case .both: [.left, .right]
+        case .left: [.left]
+        case .right: [.right]
+        case .off: []
+        }
+    }
+}
+
 /// The user's choices, kept in UserDefaults. `onChange` runs after every change.
 @Observable
 @MainActor
@@ -34,6 +50,7 @@ final class Preferences {
     var sensitivity: Double { didSet { save(sensitivity, "sensitivity") } }
     var bottomQuarterOnly: Bool { didSet { save(bottomQuarterOnly, "bottomQuarterOnly") } }
     var requireModifier: Bool { didSet { save(requireModifier, "requireModifier") } }
+    var tapToSlide: TapToSlide { didSet { save(tapToSlide.rawValue, "tapToSlide") } }
     var mediaStrip: Bool { didSet { save(mediaStrip, "mediaStrip") } }
     var tapToPlay: Bool { didSet { save(tapToPlay, "tapToPlay") } }
     var topLeftAction: CornerAction { didSet { save(Self.encode(topLeftAction), "topLeftAction") } }
@@ -53,6 +70,7 @@ final class Preferences {
         sensitivity = value("sensitivity", 1.0)
         bottomQuarterOnly = value("bottomQuarterOnly", false)
         requireModifier = value("requireModifier", false)
+        tapToSlide = TapToSlide(rawValue: value("tapToSlide", "")) ?? .both
         mediaStrip = value("mediaStrip", true)
         tapToPlay = value("tapToPlay", false)
         topLeftAction = Self.decode(defaults.data(forKey: "topLeftAction")) ?? .none
@@ -68,6 +86,7 @@ final class Preferences {
         config.sensitivity = sensitivity
         config.bottomQuarterOnly = bottomQuarterOnly
         config.requireModifier = requireModifier
+        config.tapToSlide = tapToSlide.edges
         config.mediaStrip = mediaStrip
         config.tapToPlay = tapToPlay
         config.corners = Set(Corner.allCases.filter { action(for: $0) != .none })

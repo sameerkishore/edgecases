@@ -19,6 +19,15 @@ struct SettingsView: View {
                 SettingRow(icon: "arrow.left.arrow.right", title: "Swap Sides",
                            detail: prefs.swapSides ? "Left: volume · Right: brightness" : "Left: brightness · Right: volume",
                            isOn: $prefs.swapSides)
+                SettingRow(icon: "hand.tap", tint: prefs.tapToSlide == .off ? .secondary : .brand, title: "Tap, Then Slide",
+                           detail: "Tap the edge first") {
+                    Picker("", selection: $prefs.tapToSlide) {
+                        ForEach(TapToSlide.allCases, id: \.self) { Text($0.title) }
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                    .controlSize(.small)
+                }
                 SettingRow(icon: "rectangle.bottomhalf.filled", title: "Bottom Quarter Only",
                            detail: "Ignore side touches higher up", isOn: $prefs.bottomQuarterOnly)
                 SettingRow(icon: "option", title: "Require Fn or ⌥",

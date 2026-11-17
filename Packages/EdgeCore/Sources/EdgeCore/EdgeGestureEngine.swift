@@ -28,6 +28,8 @@ public enum Corner: String, Sendable, Equatable, Hashable, CaseIterable, Codable
 public enum EdgeEvent: Sendable, Equatable {
     /// A finger came down somewhere we listen. It may still turn out to be ordinary pointing.
     case touched
+    /// A quick tap on a side edge that needs one: a slide that starts there soon after will count.
+    case armed(Edge)
     /// It turned out to be pointing, a click, or a palm.
     case cancelled
     /// The finger moved along an edge far enough to count as a slide.
@@ -55,6 +57,9 @@ public struct EdgeConfig: Sendable, Equatable {
     public var mediaStrip = true
     /// Tap the bottom edge to play or pause.
     public var tapToPlay = false
+    /// Side edges that only slide when the touch comes right after a quick tap there,
+    /// so ordinary pointing and grazing thumbs don't slide by accident.
+    public var tapToSlide: Set<Edge> = []
     /// Corners that listen for a double-tap. Each needs an action set in the app.
     public var corners: Set<Corner> = [.topRight]
 
@@ -75,6 +80,8 @@ public struct EdgeConfig: Sendable, Equatable {
     /// Longest touch that still counts as a tap, and longest gap between double-tap taps.
     public var tapDuration = 0.25
     public var doubleTapInterval = 0.4
+    /// Longest gap between lifting from the arming tap and touching down to slide.
+    public var slideAfterTapInterval = 0.4
 
     public init() {}
 }
@@ -87,7 +94,10 @@ public struct EdgeGestureEngine: Sendable {
         var x: Double
         var y: Double
         var time: Double
+        /// The side edge the touch is on, whether or not it may slide.
         var side: Edge?
+        /// False for a tap-to-slide edge that wasn't just tapped: it can only be the arming tap.
+        var slides: Bool
         var bottom: Bool
         var corner: Corner?
     }
@@ -106,6 +116,8 @@ public struct EdgeGestureEngine: Sendable {
     public var lastKeyPress: Double?
     private var phase = Phase.idle
     private var lastCornerTap: (corner: Corner, time: Double)?
+    /// The last arming tap on a tap-to-slide edge, and when the finger lifted.
+    private var armed: (edge: Edge, time: Double)?
 
     public init(config: EdgeConfig = EdgeConfig()) {
         self.config = config
@@ -118,6 +130,7 @@ public struct EdgeGestureEngine: Sendable {
     /// True while a touch that could still become a tap is down; a click now means it isn't one.
     public var isTapCandidate: Bool {
         guard case .candidate(let origin) = phase else { return false }
+        if let side = origin.side, config.tapToSlide.contains(side) { return true }
         return origin.corner != nil || (origin.bottom && config.tapToPlay)
     }
 
@@ -144,6 +157,7 @@ public struct EdgeGestureEngine: Sendable {
         switch phase {
         case .idle:
             guard let finger = contacts.first else { return [] }
+            defer { armed = nil }
             guard contacts.count == 1, !isTyping(at: time),
                   let origin = origin(of: finger, at: time, modifierHeld: modifierHeld) else {
                 phase = .ignoring
@@ -167,7 +181,7 @@ public struct EdgeGestureEngine: Sendable {
             }
             let dx = abs(finger.x - origin.x)
             let dy = abs(finger.y - origin.y)
-            if let side = origin.side, dy >= config.activationDistance, dy > dx {
+            if let side = origin.side, origin.slides, dy >= config.activationDistance, dy > dx {
                 phase = .sliding(id: origin.id, edge: side, anchor: finger.y, stepped: false)
                 return [.began(side)]
             }
@@ -214,6 +228,10 @@ public struct EdgeGestureEngine: Sendable {
             if finger.x <= config.edgeWidth { side = .left }
             if finger.x >= 1 - config.edgeWidth { side = .right }
         }
+        var slides = true
+        if let side, config.tapToSlide.contains(side) {
+            slides = armed.map { $0.edge == side && time - $0.time <= config.slideAfterTapInterval } ?? false
+        }
         let bottom = (config.mediaStrip || config.tapToPlay) && finger.y <= config.bottomHeight
         var corner: Corner?
         if finger.y >= 1 - config.cornerSize {
@@ -222,7 +240,7 @@ public struct EdgeGestureEngine: Sendable {
         }
         if let found = corner, !config.corners.contains(found) { corner = nil }
         guard side != nil || bottom || corner != nil else { return nil }
-        return Origin(id: finger.id, x: finger.x, y: finger.y, time: time, side: side, bottom: bottom, corner: corner)
+        return Origin(id: finger.id, x: finger.x, y: finger.y, time: time, side: side, slides: slides, bottom: bottom, corner: corner)
     }
 
     /// A lift that ended a candidate: was it a tap?
@@ -238,6 +256,10 @@ public struct EdgeGestureEngine: Sendable {
         }
         if origin.bottom && config.tapToPlay {
             return [.tapped(.bottom)]
+        }
+        if let side = origin.side, config.tapToSlide.contains(side) {
+            armed = (side, time)
+            return [.armed(side)]
         }
         return []
     }

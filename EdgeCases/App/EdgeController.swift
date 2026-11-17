@@ -128,6 +128,9 @@ final class EdgeController {
             cursor.remember()
         case .cancelled:
             cursor.unlock()
+        case .armed(let edge):
+            Log.action.info("\(String(describing: edge), privacy: .public) edge armed")
+            Haptics.tick(preferences.hapticStrength)
         case .began(let edge):
             Log.action.info("Slide began on \(String(describing: edge), privacy: .public)")
             slidesSeen += 1
