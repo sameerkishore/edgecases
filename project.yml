@@ -28,8 +28,8 @@ targets:
       path: EdgeCases/Info.plist
       properties:
         CFBundleDisplayName: EdgeCases
-        CFBundleShortVersionString: "0.1.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "0.2.0"
+        CFBundleVersion: "2"
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
         NSPrincipalClass: NSApplication
