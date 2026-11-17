@@ -163,3 +163,63 @@ private func config(_ change: (inout EdgeConfig) -> Void) -> EdgeConfig {
     let events = Trace(frames: path([(0.03, 0.95), (0.03, 0.9), (0.03, 0.8)])).replay(config: both)
     #expect(events.contains(.began(.left)))
 }
+
+// MARK: Tap to slide
+
+private let tapToSlide = config { $0.tapToSlide = [.left, .right] }
+
+@Test func tapToSlideIgnoresAnUnarmedSlide() {
+    let events = Trace(frames: path([(0.02, 0.8), (0.02, 0.77), (0.02, 0.6)])).replay(config: tapToSlide)
+    #expect(events == [.touched, .cancelled])
+}
+
+@Test func tapThenSlideSlides() {
+    let tap = path([(0.02, 0.5), (0.02, 0.5)])
+    let slide = path([(0.02, 0.5), (0.02, 0.53), (0.02, 0.6)], start: 0.2)
+    let events = Trace(frames: tap + slide).replay(config: tapToSlide)
+    #expect(events == [.touched, .cancelled, .armed(.left), .touched, .began(.left), .step(.left, 1), .ended(.left)])
+}
+
+@Test func slowSlideAfterTheTapDoesNotSlide() {
+    let tap = path([(0.02, 0.5), (0.02, 0.5)])
+    let slide = path([(0.02, 0.5), (0.02, 0.53), (0.02, 0.6)], start: 1)
+    let events = Trace(frames: tap + slide).replay(config: tapToSlide)
+    #expect(!events.contains(.began(.left)))
+}
+
+@Test func tapOnTheOtherEdgeDoesNotArm() {
+    let tap = path([(0.98, 0.5), (0.98, 0.5)])
+    let slide = path([(0.02, 0.5), (0.02, 0.53), (0.02, 0.6)], start: 0.2)
+    let events = Trace(frames: tap + slide).replay(config: tapToSlide)
+    #expect(!events.contains(.began(.left)))
+}
+
+@Test func armingLastsForOneTouch() {
+    let tap = path([(0.02, 0.5), (0.02, 0.5)])
+    let first = path([(0.02, 0.5), (0.02, 0.53), (0.02, 0.6)], start: 0.2)
+    let second = path([(0.02, 0.5), (0.02, 0.53), (0.02, 0.6)], start: 0.3)
+    let events = Trace(frames: tap + first + second).replay(config: tapToSlide)
+    #expect(events.filter { $0 == .began(.left) }.count == 1)
+}
+
+@Test func longPressDoesNotArm() {
+    let press = path(Array(repeating: (0.02, 0.5), count: 40))
+    let slide = path([(0.02, 0.5), (0.02, 0.53), (0.02, 0.6)], start: 0.5)
+    let events = Trace(frames: press + slide).replay(config: tapToSlide)
+    #expect(!events.contains(.began(.left)))
+}
+
+@Test func tapToSlideOnOneEdgeOnly() {
+    let leftOnly = config { $0.tapToSlide = [.left] }
+    #expect(Trace(frames: path([(0.98, 0.3), (0.98, 0.33), (0.98, 0.4)])).replay(config: leftOnly).contains(.began(.right)))
+    #expect(!Trace(frames: path([(0.02, 0.3), (0.02, 0.33), (0.02, 0.4)])).replay(config: leftOnly).contains(.began(.left)))
+}
+
+@Test func sideTapIsATapCandidateOnlyWithTapToSlide() {
+    var engine = EdgeGestureEngine()
+    _ = engine.process([Contact(id: 1, x: 0.02, y: 0.5)], at: 0)
+    #expect(!engine.isTapCandidate)
+    engine = EdgeGestureEngine(config: tapToSlide)
+    _ = engine.process([Contact(id: 1, x: 0.02, y: 0.5)], at: 0)
+    #expect(engine.isTapCandidate)
+}

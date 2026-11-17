@@ -11,6 +11,8 @@ Slide along the edges of your MacBook trackpad to change brightness (left edge) 
 ## What it does
 
 - **Left edge:** slide up or down for brightness. **Right edge:** volume. Swap them if you like.
+- **Tap, then slide:** tap the edge once, then touch again and slide, so pointing near the edge
+  doesn't change anything by accident. On for both sides; turn it off or keep it on one side in Settings.
 - **Bottom edge:** swipe to skip tracks; optionally tap to play or pause.
 - **Top corners:** double-tap to mute, play or pause, press any keyboard shortcut you record
   (⌘Space for Raycast, ⌃⌘Q to lock), or open an app.

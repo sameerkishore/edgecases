@@ -30,7 +30,9 @@ struct SetupGuideView: View {
                     }
                 }
                 GuideStep(number: 2, done: slid, title: "Try your first slide",
-                          detail: "Put one finger on the right edge of the trackpad and slide it up or down.") {
+                          detail: edges.preferences.tapToSlide.edges.contains(.right)
+                            ? "Tap the right edge of the trackpad once, then put your finger back and slide it up or down."
+                            : "Put one finger on the right edge of the trackpad and slide it up or down.") {
                     EmptyView()
                 }
             }
